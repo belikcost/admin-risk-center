@@ -1,0 +1,236 @@
+{
+  "users": [
+    {
+      "id": 636865924,
+      "name": "Константин",
+      "role": "Администратор",
+      "is_active": true
+    },
+    {
+      "id": 2
+    },
+    {
+      "id": 3
+    },
+    {
+      "id": 4
+    },
+    {
+      "id": 5
+    },
+    {
+      "id": 6
+    },
+    {
+      "id": 7,
+      "name": "Игорь2222",
+      "client": 1,
+      "role": "Сотрудник",
+      "projects": [
+        1,
+        2,
+        3
+      ],
+      "leader": 1,
+      "users": [
+        4,
+        5,
+        2
+      ],
+      "is_active": false
+    },
+    {
+      "id": 8,
+      "name": "Игорь",
+      "client": 2,
+      "role": "Сотрудник",
+      "projects": [
+        1,
+        2,
+        3
+      ],
+      "leader": 1,
+      "users": [
+        4,
+        5,
+        2
+      ],
+      "is_active": true
+    },
+    {
+      "is_active": true,
+      "client": 1,
+      "role": "Администратор",
+      "name": "Ккккк",
+      "id": 636865925
+    },
+    {
+      "is_active": true,
+      "name": "тестер",
+      "client": 1,
+      "role": "Тестер",
+      "id": 636865926
+    },
+    {
+      "is_active": true,
+      "name": "тестер",
+      "client": 1,
+      "role": "Тестер",
+      "id": 636865927
+    },
+    {
+      "is_active": true,
+      "name": "тестер",
+      "client": 1,
+      "role": "Тестер",
+      "id": 636865928
+    },
+    {
+      "is_active": true,
+      "name": "fgrgrgr",
+      "client": 1,
+      "role": "grgrgrgr",
+      "id": 636865929
+    },
+    {
+      "is_active": true,
+      "name": "fgrgrgr",
+      "client": 1,
+      "role": "grgrgrgr",
+      "id": 636865930
+    },
+    {
+      "is_active": true,
+      "name": "fgrgrgr",
+      "client": 1,
+      "role": "grgrgrgr",
+      "id": 636865931
+    },
+    {
+      "is_active": true,
+      "name": "ggg",
+      "client": 1,
+      "role": "1111",
+      "id": 636865932
+    },
+    {
+      "is_active": true,
+      "name": "ggfgf",
+      "client": 1,
+      "role": "1111",
+      "average_note": 10,
+      "id": 636865933
+    },
+    {
+      "is_active": false,
+      "name": "ffgfgfgr",
+      "client": 1,
+      "role": "12121212",
+      "average_note": 10,
+      "id": 636865934
+    }
+  ],
+  "clients": [
+    {
+      "id": 1,
+      "name": "ООО Ромашка",
+      "max_users": 3,
+      "max_app": 3,
+      "is_active": true
+    },
+    {
+      "id": 2,
+      "name": "ООО Море",
+      "max_users": 3,
+      "max_app": 3,
+      "is_active": false
+    },
+    {
+      "id": 3,
+      "name": "ООО Волна",
+      "max_users": 3,
+      "max_app": 3,
+      "is_active": true
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "name": "Иск #332",
+      "leader": 1,
+      "is_active": true,
+      "apps": [
+        {
+          "id": 1,
+          "name": "13311331133113",
+          "type": "arbitrage",
+          "is_active": true
+        },
+        {
+          "id": 2,
+          "name": "13311331133113",
+          "type": "arbitrage",
+          "is_active": true
+        },
+        {
+          "id": 3,
+          "name": "13311331133113",
+          "type": "monitoring",
+          "is_active": true
+        },
+        {
+          "id": 4,
+          "name": "13131313154443",
+          "type": "arbitrage",
+          "is_active": false
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Иск #333",
+      "leader": 1,
+      "is_active": true,
+      "apps": [
+        {
+          "id": 1,
+          "name": "13311331133113",
+          "type": "monitoring",
+          "is_active": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Иск #334",
+      "leader": 1,
+      "is_active": true
+    },
+    {
+      "id": 111,
+      "name": "Иск #334",
+      "leader": 1,
+      "is_active": true,
+      "apps": [
+        {
+          "id": 1,
+          "name": "13311331133113",
+          "type": "arbitrage",
+          "is_active": true
+        },
+        {
+          "id": 2,
+          "name": "13131313154443",
+          "type": "arbitrage",
+          "is_active": true
+        },
+        {
+          "id": 3,
+          "name": "13131313154443",
+          "type": "arbitrage",
+          "is_active": true
+        }
+      ]
+    }
+  ]
+}

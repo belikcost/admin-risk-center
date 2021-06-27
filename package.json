@@ -1,0 +1,49 @@
+{
+  "name": "riskcenter.app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/styles": "^4.11.4",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@zach.codes/react-calendar": "^0.2.0",
+    "date-fns": "^2.22.1",
+    "history": "^4.10.1",
+    "prop-types": "^15.7.2",
+    "ra-data-json-server": "^3.16.0",
+    "ra-i18n-polyglot": "^3.16.3",
+    "ra-language-russian": "^3.13.5",
+    "react": "^17.0.2",
+    "react-admin": "^3.16.3",
+    "react-dom": "16.8.4",
+    "react-scripts": "4.0.3",
+    "react-telegram-login": "^1.1.2",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "set PORT=80 && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

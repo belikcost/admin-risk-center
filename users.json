@@ -1,0 +1,8 @@
+{
+"admin": {
+             "clients-create": true,
+             "clients-read": true,
+             "clients-update": true,
+             "clients-delete": true
+           },
+}
