@@ -5,5 +5,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="react-calendar-master" />
+    <orderEntry type="module" module-name="test-app" />
+    <orderEntry type="module" module-name="test-task" />
   </component>
 </module>

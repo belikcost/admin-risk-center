@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/react-admin.iml" filepath="$PROJECT_DIR$/.idea/react-admin.iml" />
       <module fileurl="file://$PROJECT_DIR$/../react-calendar-master/.idea/react-calendar-master.iml" filepath="$PROJECT_DIR$/../react-calendar-master/.idea/react-calendar-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../test-app/.idea/test-app.iml" filepath="$PROJECT_DIR$/../test-app/.idea/test-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../test-task/.idea/test-task.iml" filepath="$PROJECT_DIR$/../test-task/.idea/test-task.iml" />
     </modules>
   </component>
 </project>

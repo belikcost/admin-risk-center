@@ -4,7 +4,7 @@ import {
     SimpleShowLayout,
     TextField,
     BooleanField,
-    useRecordContext
+    DataProviderContext
 } from 'react-admin';
 import Card from '@material-ui/core/Card';
 import {makeStyles} from '@material-ui/core/styles';
@@ -17,7 +17,7 @@ import {
     MonthlyNav,
     DefaultMonthlyEventItem,
 } from '@zach.codes/react-calendar';
-import {useState} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -27,104 +27,160 @@ import TableRow from '@material-ui/core/TableRow';
 import ClearIcon from '@material-ui/icons/Clear';
 import CheckIcon from '@material-ui/icons/Check';
 import {format, startOfMonth} from "date-fns";
-
-const useStyles = makeStyles({
-    calendarDay: {
-        maxHeight: '10vh'
-    },
-    calendar: {
-        maxHeight: '80%',
-        margin: '0 auto'
-    }
-});
+import Loading from "../Loading";
+import {CardActions, CardHeader, useMediaQuery} from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 
 const ShowProject = (props) => {
-    const classes = useStyles();
-    const [events, setEvents] = useState([]);
+    const isSmall = useMediaQuery('(max-width: 600px)');
+    const isRemovePadding = useMediaQuery('(max-width: 850px)');
     const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
     const [isCalendar, setIsCalendar] = useState(false);
-    const TableField = (props) => {
-        const {source} = props;
-        const record = useRecordContext(props);
-        if (!record[source]) return null;
-        const showCalendar = (id) => {
-            console.log(id, process.env.REACT_APP_URL);
-            setIsCalendar(true);
-            // fetch(process.env.REACT_APP_URL + "login", {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json;charset=utf-8'
-            //     },
-            //     body: JSON.stringify({login: process.env.REACT_APP_LOGIN, password: process.env.REACT_APP_PASSWD})
-            // }).then(res => res.json()).then(res => console.log(res));
-            const res = [
-                {
-                    id: 1,
-                    date: "Wed, 2 Jun 2021 12:35:40 UTC",
-                },
-                {
-                    id: 2,
-                    date: "Wed, 9 Jun 2021 12:35:40 UTC",
-                },
-                {
-                    id: 3,
-                    date: "Wed, 16 Jun 2021 12:35:40 UTC",
-                },
-                {
-                    id: 4,
-                    date: "Wed, 23 Jun 2021 12:35:40 UTC",
-                }
-            ];
-            let dates = [];
-            res.forEach(d => {
-                dates.push({date: new Date(d.date)});
-            });
-            setEvents(dates);
-
+    const [apps, setApps] = useState([]);
+    const [events, setEvents] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const dataProvider = useContext(DataProviderContext);
+    const isShowCard = useMediaQuery('(max-width: 1135px)');
+    const useStyles = makeStyles({
+        calendarDay: {
+            maxHeight: '10vh'
+        },
+        calendarButton: {
+            cursor: 'pointer',
+            color: 'rgba(255,255,255,.7)',
+            transition: 'all .3s',
+            '&:hover': {
+                color: '#fff'
+            }
+        },
+        calendar: {
+            boxShadow: '0 1px 5px rgb(0 0 0 / 10%)',
+            borderRadius: '2px',
+            margin: !isSmall && '0 1rem 1rem',
+            padding: isSmall ? '.5rem 1rem' : (isRemovePadding ? '24px 0' : '2.2rem'),
+            backgroundColor: 'rgba(0,0,0,.2)',
+            fontFamily: 'Nunito, sans-serif',
+        },
+        appsCont: {
+            display: 'flex'
         }
-        let showCalendarButtonClasses = window.screen.availWidth > 600 ? 'MuiButtonBase-root MuiButton-root MuiButton-text RaButton-button-6 MuiButton-textPrimary MuiButton-textSizeSmall MuiButton-sizeSmall' : 'MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary'
+    });
+
+    useEffect(() => {
+        dataProvider.getList("requests", {
+            pagination: {page: 1, perPage: 9999},
+            sort: {field: 'id', order: 'ASC'},
+            filter: {project_id: props.id},
+        }).then(res => {
+            console.log(res);
+            setApps(res.data);
+            setIsLoading(false);
+        });
+    }, [])
+    const TableField = (props) => {
+        const useStyles = makeStyles(() => ({
+            headerText: {
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center'
+            },
+            label: {
+                marginRight: '5px'
+            },
+            card: {
+                width: '100%',
+                fontSize: '0.875rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(0,0,0,.2)',
+                marginBottom: '1rem'
+            },
+            actions: {
+                flexDirection: 'column',
+                alignItems: 'baseline'
+            }
+        }));
+        const classes_card = useStyles();
+        const showCalendar = (id) => {
+            setIsLoading(true);
+            fetch(process.env.REACT_APP_API + '/requests/' + id + '/meetings').then(r => r.json()).then(r => {
+                let dates = [];
+                r.dates.forEach(d => {
+                    dates.push({date: new Date(d)});
+                });
+                setEvents(dates);
+                setIsCalendar(true);
+                setIsLoading(false);
+            });
+        }
         return (
             <>
-                <label
-                    className="MuiFormLabel-root MuiInputLabel-root RaLabeled-label-55 MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-marginDense">
-                    <span>Заявки</span>
-                </label>
-                <Table>
+                {isShowCard ? props.apps.map((a, i) =>
+                    <Card key={i} className={classes_card.card}>
+                        <CardHeader
+                            title={<Typography variant="body2">{a.value}</Typography>}
+                            subheader={
+                                <>
+                                    <div className={classes_card.headerText}>
+                                        <Typography variant="body2" className={classes_card.label}>ID:</Typography>
+                                        <Typography variant="body2">{a.id}</Typography>
+                                    </div>
+                                    <div className={classes_card.headerText}>
+                                        <Typography variant="body2" className={classes_card.label}>Тип:</Typography>
+                                        <Typography variant="body2">{a.type === 'arbitrage' ? "Арбитражная" :
+                                            "Мониторинговая"}</Typography>
+                                    </div>
+                                </>
+                            }
+                        />
+                        {a.type === 'arbitrage' &&
+                        <CardActions className={classes_card.actions}>
+                            <a className={classes.calendarButton}
+                               onClick={() => showCalendar(a.id)}
+                            ><DateRangeIcon/> {!isSmall &&
+                            <span className="RaButton-label-7">Заседания</span>}
+                            </a>
+                        </CardActions>
+                        }
+                    </Card>
+                ) : (<Table>
                     <TableHead>
                         <TableRow>
                             <TableCell align="left">ID</TableCell>
                             <TableCell align="left">ИНН/номер дела</TableCell>
                             <TableCell align="left">Тип</TableCell>
                             <TableCell align="left">Активность</TableCell>
-                            <TableCell></TableCell>
+                            <TableCell>&nbsp;</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {record[source].map(a => (
+                        {props.apps.map(a => (
                             <TableRow key={a.id}>
                                 <TableCell align="left">{a.id}</TableCell>
-                                <TableCell align="left">{a.name}</TableCell>
+                                <TableCell align="left">{a.value}</TableCell>
                                 <TableCell
                                     align="left">{a.type === 'arbitrage' ? "Арбитражная" : "Мониторинговая"}</TableCell>
                                 <TableCell align="left">{a.is_active ? <CheckIcon fontSize="small"/> :
                                     <ClearIcon fontSize="small"/>}</TableCell>
                                 <TableCell align="left">{a.type === 'arbitrage' &&
-                                <a
-                                    className={showCalendarButtonClasses}
-                                    onClick={() => showCalendar(a.id)}><DateRangeIcon/> {window.screen.availWidth > 600 &&
-                                <span className="RaButton-label-7">Календарь заседаний</span>}
+                                <a className={classes.calendarButton}
+                                   onClick={() => showCalendar(a.id)}
+                                ><DateRangeIcon/> {!isSmall &&
+                                <span className="RaButton-label-7">Заседания</span>}
                                 </a>}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
-                </Table>
+                </Table>)}
+
             </>
         );
     }
-
+    const classes = useStyles();
     if (isCalendar) {
         return (
-            <Card className={classes.calendarCard}>
+            <Card>
                 <CardContent className={classes.calendar}>
                     <MonthlyCalendar
                         currentMonth={currentMonth}
@@ -139,7 +195,6 @@ const ShowProject = (props) => {
                                     <DefaultMonthlyEventItem
                                         key={index}
                                         title={item.title}
-                                        // Format the date here to be in the format you prefer
                                         date={format(item.date, 'k:mm')}
                                     />
                                 ))
@@ -150,17 +205,20 @@ const ShowProject = (props) => {
             </Card>
         );
     } else {
-        return (
-            <Show {...props}>
-                <SimpleShowLayout>
-                    <TextField source="id" label="ID"/>
-                    <TextField source="name" label="Название"/>
-                    <BooleanField source="is_active" label="Активность"/>
-                    <TableField source="apps"/>
-                </SimpleShowLayout>
-            </Show>
-        );
+        if (isLoading) {
+            return (<Loading/>);
+        } else {
+            return (
+                <Show {...props}>
+                    <SimpleShowLayout>
+                        <TextField source="id" label="ID"/>
+                        <TextField source="name" label="Название"/>
+                        <BooleanField source="is_active" label="Активность"/>
+                        {apps.length !== 0 && <TableField apps={apps} id={props.id} className={classes.appsCont}/>}
+                    </SimpleShowLayout>
+                </Show>
+            );
+        }
     }
 }
-
 export default ShowProject;

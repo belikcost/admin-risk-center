@@ -6,14 +6,20 @@ import {
     BooleanField,
     EditButton,
     ShowButton,
-    useGetIdentity, BulkDeleteButton,
+    BulkDeleteButton,
 } from 'react-admin';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import {Fragment} from "react";
+import {Fragment, useEffect, useState} from "react";
+import {useMediaQuery} from "@material-ui/core";
+import CardsList from "../CardsList";
+import Loading from "../Loading";
 
 const ProjectsList = (props) => {
+    const isShowCard = useMediaQuery('(max-width: 1135px)');
+    const [filter, setFilter] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const permission = props.permissions === 'leader' || props.permissions === 'user';
     const PostBulkActionButtons = btn_props => {
-        if (props.permissions === 'leader' || props.permissions === 'user') {
+        if (permission) {
             return null;
         } else {
             return (
@@ -23,22 +29,31 @@ const ProjectsList = (props) => {
             );
         }
     }
-    const {identity} = useGetIdentity();
-    let filter = identity && props.permissions !== 'admin' && props.permissions !== 'coordinator' ?
-        {id: identity.projects} : {};
-
-    if (props.permissions !== 'admin' && !identity) {
-        return (<CircularProgress/>);
+    useEffect(() => {
+        fetch(process.env.REACT_APP_API + '/users/current', {
+            method: 'GET',
+            headers: {
+                'Authorization': "Token " + localStorage.getItem('token')
+            }
+        }).then(res => res.json()).then(res => {
+            !permission && setFilter({id: res.projects});
+            setIsLoading(false);
+        });
+    }, [])
+    if (permission && isLoading) {
+        return (<Loading/>);
     } else {
         return (
             <List {...props} filter={filter} bulkActionButtons={<PostBulkActionButtons />}>
-                <Datagrid>
-                    <TextField source="id" label="ID"/>
-                    <TextField source="name" label="Название"/>
-                    <BooleanField source="is_active" label="Активность"/>
-                    <EditButton basePath="/projects" record="id"/>
-                    <ShowButton basePath="/projects" record="id"/>
-                </Datagrid>
+                {isShowCard ? <CardsList edit={true} delete={!permission}/> :
+                    <Datagrid>
+                        <TextField source="id" label="ID"/>
+                        <TextField source="name" label="Название"/>
+                        <BooleanField source="is_active" label="Активность"/>
+                        <EditButton basePath="/projects" record="id"/>
+                        <ShowButton basePath="/projects" record="id"/>
+                    </Datagrid>
+                }
             </List>
         )
     }

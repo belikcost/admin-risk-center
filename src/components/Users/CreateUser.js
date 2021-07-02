@@ -9,22 +9,19 @@ import {
     SelectArrayInput,
     useGetList,
     DataProviderContext,
-    useGetIdentity,
     useCreate,
     useRedirect,
     useNotify,
 } from 'react-admin';
-import {useCallback, useContext} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
+import roles from "../../roles";
+import Loading from "../Loading";
 
 
 const CreateUser = (props) => {
-    const {identity} = useGetIdentity();
-    let clients_filter = identity && props.permissions !== 'admin' ? {id: identity.client} : {},
-        projects_filter = identity && props.permissions !== 'admin' ? {id: identity.projects} : {},
-        users_filter = identity && props.permissions !== 'admin' ? {id: identity.users} : {};
-    const users = useGetList('users', undefined, undefined, users_filter);
-    const projects = useGetList('projects', undefined, undefined, projects_filter);
-    const clients = useGetList('clients', undefined, undefined, clients_filter);
+    const [usersFilter, setUsersFilter] = useState({});
+    const [clientsFilter, setClientsFilter] = useState({});
+    const [projectsFilter, setProjectsFilter] = useState({});
     const dataProvider = useContext(DataProviderContext);
     const [create] = useCreate('users');
     const redirectTo = useRedirect();
@@ -64,8 +61,26 @@ const CreateUser = (props) => {
         },
         [create, notify, redirectTo, basePath]
     );
-    if (clients.loading || users.loading || projects.loading) {
-        return null;
+
+    useEffect(() => {
+        props.permissions !== 'admin' && fetch(process.env.REACT_APP_API + '/users/current', {
+            method: 'GET',
+            headers: {
+                'Authorization': "Token " + localStorage.getItem('token')
+            }
+        }).then(res => res.json()).then(res => {
+            setUsersFilter({id: res.users});
+            setClientsFilter({id: res.client});
+            setProjectsFilter({id: res.projects});
+        });
+    }, []);
+
+    const users = useGetList('users', undefined, undefined, usersFilter);
+    const projects = useGetList('projects', undefined, undefined, projectsFilter);
+    const clients = useGetList('clients', undefined, undefined, clientsFilter);
+
+    if (Object.keys(usersFilter).length === 0) {
+        return <Loading/>;
     } else {
         return (
             <Create {...props}>
@@ -74,7 +89,8 @@ const CreateUser = (props) => {
                     <BooleanInput source="is_active" label="Активность" defaultValue={true}/>
                     <AutocompleteInput source="client" label="Клиент" choices={Object.values(clients.data)}
                                        validate={required()}/>
-                    <TextInput source="role" label="Роль" validate={required()}/>
+                    <AutocompleteInput source="role" label="Роль" choices={props.permissions !== 'admin' ? roles.filter(e =>
+                        e.id !== 'admin') : roles} validate={required()}/>
                     <AutocompleteInput source="leader" label="Руководитель" choices={Object.values(users.data)}/>
                     <SelectArrayInput source="users" label="Сотрудники" choices={Object.values(users.data)}/>
                     <SelectArrayInput source="projects" label="Проекты" choices={Object.values(projects.data)}/>

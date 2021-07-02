@@ -54,7 +54,8 @@ const EditProject = (props) => {
                 notify('У данного клиента больше не может быть активных заявок!')
                 return;
             }
-            update(values.id, "projects", values);
+            console.log(values.id)
+            update("projects", values.id, values);
             redirectTo("/projects");
         },
         [update, notify, redirectTo, basePath]);
@@ -68,7 +69,6 @@ const EditProject = (props) => {
                 <BooleanInput source="is_active" label="Активность" defaultValue={true}/>
                 <ArrayInput source="apps" label="Заявки">
                     <SimpleFormIterator>
-                        <TextInput source="id" disabled label="ID"/>
                         <TextInput source="name" label="ИНН/номер" validate={required()}/>
                         <SelectInput source="type" label="Тип" choices={[{id: 'arbitrage', name: 'Арбитражная'}, {
                             id: 'monitoring',

@@ -17,7 +17,6 @@ export default class EditClient extends Component {
         return (
             <Edit {...this.props}>
                 <SimpleForm>
-                    <TextInput source="id" label="ID" disabled/>
                     <TextInput source="name" validate={required()} label="Название"/>
                     <TextInput source="max_users" validate={required()} label="Макс.сотрудников"/>
                     <TextInput source="max_app" validate={required()} label="Макс.активных заявок"/>

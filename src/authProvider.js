@@ -1,39 +1,42 @@
 const authProvider = {
-    // called when the user attempts to log in
-    login: ({ username, permissions }) => {
-        localStorage.setItem('username', username);
-        localStorage.setItem('permissions', permissions);
+    login: ({name, role}) => {
+        localStorage.setItem('username', name);
+        localStorage.setItem('permissions', role);
         // accept all username/password combinations
         return Promise.resolve();
     },
-    // called when the user clicks on the logout button
     logout: () => {
         localStorage.removeItem('username');
         return Promise.resolve();
     },
-    // called when the API returns an error
-    checkError: ({ status }) => {
+    checkError: ({status}) => {
         if (status === 401 || status === 403) {
             localStorage.removeItem('username');
             return Promise.reject();
         }
         return Promise.resolve();
     },
-    // called when the user navigates to a new location, to check for authentication
     checkAuth: () => {
         return localStorage.getItem('username')
             ? Promise.resolve()
             : Promise.reject();
     },
-    // called when the user navigates to a new location, to check for permissions / roles
     getPermissions: () => {
         const role = localStorage.getItem('permissions');
         return role ? Promise.resolve(role) : Promise.reject();
     },
-    getIdentity: () => {
+    getIdentity: async () => {
         try {
-            const test = JSON.parse(localStorage.getItem('auth'));
-            return Promise.resolve(test);
+            let result;
+            await fetch(process.env.REACT_APP_API + '/users/current', {
+                method: 'GET',
+                headers: {
+                    'Authorization': "Token " + localStorage.getItem('token')
+                }
+            }).then(res => res.json()).then(res => {
+                result = {id: res.id, fullName: res.name, avatar: res.photo_url};
+            });
+            return Promise.resolve(result);
         } catch (error) {
             return Promise.reject(error);
         }
