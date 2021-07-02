@@ -31,7 +31,7 @@ const CustomMenu = () => {
             <DashboardMenuItem className={classes.menuItem} to="/" primaryText="Главная" leftIcon={<DashboardIcon className={classes.menuIcon}/>}/>
             {permissions !== 'user' &&
             <MenuItemLink className={classes.menuItem} to="/users" primaryText="Пользователи" leftIcon={<PersonIcon className={classes.menuIcon}/>}/>}
-            {permissions !== 'leader' && permissions !== 'user' &&
+            {permissions !== 'leader' && permissions !== 'user' && permissions !== 'coordinator' &&
             <MenuItemLink className={classes.menuItem} to="/clients" primaryText="Клиенты" leftIcon={<BusinessCenterIcon className={classes.menuIcon}/>}/>}
             <MenuItemLink className={classes.menuItem} to="/projects" primaryText="Проекты" leftIcon={<ReceiptIcon className={classes.menuIcon}/>}/>
         </div>

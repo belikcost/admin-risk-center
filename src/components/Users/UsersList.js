@@ -14,17 +14,6 @@ import CardsList from '../CardsList';
 import Loading from "../Loading";
 
 const UsersList = (props) => {
-    const PostBulkActionButtons = btn_props => {
-        if (props.permissions === 'leader') {
-            return null;
-        } else {
-            return (
-                <Fragment>
-                    <BulkDeleteButton {...btn_props} />
-                </Fragment>
-            );
-        }
-    };
     const [filter, setFilter] = useState({});
     const isShowCard = useMediaQuery('(max-width: 1135px)');
 
@@ -43,9 +32,9 @@ const UsersList = (props) => {
         return <Loading/>;
     } else {
         return (
-            <List {...props} bulkActionButtons={<PostBulkActionButtons/>}>
+            <List {...props} filter={{role: ['leader', 'null', 'user', 'coordinator']}} bulkActionButtons={null}>
                 {isShowCard ?
-                    <CardsList edit={true} delete={props.permissions === 'admin'}/>
+                    <CardsList edit={true} delete={false}/>
                     :
                     <Datagrid>
                         <TextField source="id" label="ID"/>

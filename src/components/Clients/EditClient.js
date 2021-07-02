@@ -4,9 +4,17 @@ import {
     SimpleForm,
     TextInput,
     required,
-    BooleanInput
+    BooleanInput, Toolbar, SaveButton
 } from 'react-admin';
 import {Component} from "react";
+
+const EditToolbar = props => {
+    return (
+        <Toolbar {...props}>
+            <SaveButton />
+        </Toolbar>
+    );
+};
 
 export default class EditClient extends Component {
     constructor(props) {
@@ -16,7 +24,7 @@ export default class EditClient extends Component {
     render() {
         return (
             <Edit {...this.props}>
-                <SimpleForm>
+                <SimpleForm toolbar={<EditToolbar/>}>
                     <TextInput source="name" validate={required()} label="Название"/>
                     <TextInput source="max_users" validate={required()} label="Макс.сотрудников"/>
                     <TextInput source="max_app" validate={required()} label="Макс.активных заявок"/>

@@ -8,6 +8,7 @@ import {
     required,
     SelectArrayInput,
     Toolbar,
+    SaveButton,
     DataProviderContext, useUpdate, useRedirect, useNotify
 } from 'react-admin';
 import {useCallback, useContext, useState, useEffect} from "react";
@@ -19,7 +20,9 @@ import {makeStyles} from "@material-ui/core/styles";
 const EditToolbar = props => {
     const customProps = {...props, pristine: !(!props.pristine || props.disabled !== "true")};
     return (
-        <Toolbar {...customProps}/>
+        <Toolbar {...customProps}>
+            <SaveButton />
+        </Toolbar>
     );
 };
 
@@ -54,12 +57,14 @@ const SelectUsers = (props) => {
         },
     });
     const classes = useStyles();
+    console.log(props.selected);
     return (
         <>
             <InputLabel className={classes.label}>
                 Сотрудники
             </InputLabel>
             <Select
+                disabled={props.disabled}
                 className={classes.select}
                 multiple
                 value={props.selected.data}
@@ -101,6 +106,7 @@ const EditUser = (props) => {
     const notify = useNotify();
     const {basePath} = props;
     const this_user_id = props.id;
+    const [disabledChangeRole, setDisabledChangeRole] = useState(true);
     useEffect(() => {
         fetch(process.env.REACT_APP_API + '/users/current', {
             method: 'GET',
@@ -121,7 +127,7 @@ const EditUser = (props) => {
                 sort: {field: 'id', order: 'ASC'},
                 filter: res.role !== 'admin' ? {client: res.client} : {}
             }).then(r => {
-                setUsers(r);
+                setUsers({...r, data: r.data.filter(u => u.id !== +this_user_id)});
             });
             dataProvider.getList("users", {
                 pagination: {page: 1, perPage: 9999},
@@ -141,6 +147,7 @@ const EditUser = (props) => {
                 res.role !== 'admin' && setDisabledClients(true);
                 setClients(r);
             });
+            res.id !== +this_user_id && setDisabledChangeRole(false);
         });
     }, []);
     const save = useCallback(
@@ -173,19 +180,22 @@ const EditUser = (props) => {
     if (!clients.data || !users.data || !projects.data || !selectedUsers.data) {
         return <Loading/>
     } else {
+        console.log(props.permissions);
+        let disabledNotCoordinator = props.permissions !== 'coordinator' && props.permissions !== 'admin';
         let role_choices = props.permissions !== 'admin' ? roles.filter(e => e.id !== 'admin') : roles;
         return (
             <Edit {...props}>
                 <SimpleForm save={(v) => save(v, selectedUsers)}
-                            toolbar={<EditToolbar disabled={saveDisabled.toString()}/>}>
+                            toolbar={<EditToolbar disabled={saveDisabled}/>}>
                     <TextInput source="name" label="ФИО" validate={required()}/>
-                    <BooleanInput source="is_active" label="Активность"/>
+                    <BooleanInput source="is_active" label="Активность" disabled={disabledNotCoordinator}/>
                     <AutocompleteInput source="client" label="Клиент" disabled={disabledClients}
                                        choices={clients.data} validate={required()}/>
-                    <AutocompleteInput source="role" label="Роль"
+                    <AutocompleteInput source="role" label="Роль" disabled={disabledChangeRole}
                                        choices={role_choices} validate={required()}/>
-                    <AutocompleteInput source="leader" label="Руководитель" choices={users.data}/>
+                    <AutocompleteInput source="leader" label="Руководитель" disabled={disabledNotCoordinator} choices={users.data}/>
                     <SelectUsers
+                        disabled={disabledNotCoordinator}
                         selected={selectedUsers}
                         setSelected={setSelectedUsers}
                         users={users}

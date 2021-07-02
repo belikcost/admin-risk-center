@@ -49,6 +49,8 @@ export default class App extends Component {
             users_list = null;
             clients_list = null;
             create_project = null;
+        } else if (permission === 'coordinator') {
+            clients_list = null;
         }
 
         return [

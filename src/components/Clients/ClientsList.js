@@ -25,8 +25,8 @@ const ClientsList = (props) => {
         return (<Loading/>);
     } else {
         return (
-        <List {...props} filter={filter}>
-            {isShowCard ?  <CardsList edit={true} delete={true}/> :
+        <List {...props} filter={filter} bulkActionButtons={null}>
+            {isShowCard ?  <CardsList edit={true} delete={false}/> :
                 <Datagrid>
                 <TextField source="id" label="ID"/>
                 <TextField source="name" label="Название"/>
