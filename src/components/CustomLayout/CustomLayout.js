@@ -18,12 +18,15 @@ import {Notification, setSidebarVisibility, Sidebar,} from 'react-admin';
 import {createMuiTheme, useMediaQuery} from "@material-ui/core";
 import CustomAppBar from "./CustomAppBar";
 import CustomMenu from "./CustomMenu";
+import roles from "../../roles";
+import Typography from "@material-ui/core/Typography";
 
 const MyLayout = ({logout, children, dashboard, title}) => {
     const isSmall = useMediaQuery('(max-width: 600px)');
     const themes = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8, bg9, bg10];
-    const colors = ['#772036', '#273C5B', '#174042','#383844', '#49423F', '#5e3d22', '#234d6d', '#3b5e5e', '#0a4c3e', '#7b3d54'];
+    const colors = ['#772036', '#273C5B', '#174042', '#383844', '#49423F', '#5e3d22', '#234d6d', '#3b5e5e', '#0a4c3e', '#7b3d54'];
     const [thisTheme, setThisTheme] = useState(bg1);
+    const permission = localStorage.getItem('permissions');
     useEffect(() => {
         let theme = localStorage.getItem('theme');
         theme && setThisTheme(theme);
@@ -35,6 +38,7 @@ const MyLayout = ({logout, children, dashboard, title}) => {
             zIndex: 1,
             height: '100vh',
             transition: 'all .3s',
+            backgroundRepeat: 'no-repeat',
             backgroundImage: 'url(' + thisTheme + ')',
             backgroundSize: '100% 100%',
             backgroundAttachment: 'fixed',
@@ -63,6 +67,25 @@ const MyLayout = ({logout, children, dashboard, title}) => {
             background: 'rgba(0,0,0,.125)',
             color: '#fff',
             padding: '15px'
+        },
+        roleWrapper: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            whiteSpace: 'nowrap',
+            color: 'rgba(255,255,255,.8)',
+            transition: 'all .3s',
+            cursor: 'pointer',
+            '&:hover': {
+                color: '#fff'
+            }
+        },
+        roleText: {
+          fontSize: '13px'
+        },
+        role: {
+            textDecoration: 'underline',
+            marginLeft: '.25rem'
         }
     }));
     const classes = useStyles();
@@ -78,6 +101,9 @@ const MyLayout = ({logout, children, dashboard, title}) => {
             RaSidebar: {
                 drawerPaper: isSmall && {
                     backgroundColor: '#000 !important'
+                },
+                paper: {
+                    justifyContent: 'space-between'
                 }
             },
             MuiListItem: {
@@ -201,7 +227,7 @@ const MyLayout = ({logout, children, dashboard, title}) => {
             },
             MuiSwitch: {
                 colorPrimary: {
-                    color: '#fff !important'
+                    color: '#fff'
                 },
                 track: {
                     backgroundColor: '#000 !important',
@@ -252,13 +278,6 @@ const MyLayout = ({logout, children, dashboard, title}) => {
                 }
             },
             MuiFilledInput: {
-                root: {
-                    color: '#fff',
-                    backgroundColor: 'inherit !important',
-                    '&:hover': {
-                        backgroundColor: 'inherit'
-                    }
-                },
                 underline: {
                     '&:hover': {
                         '&:before': {
@@ -270,6 +289,33 @@ const MyLayout = ({logout, children, dashboard, title}) => {
                     },
                     '&:after': {
                         borderBottom: '1px solid #fff'
+                    }
+                }
+            },
+            MuiInput: {
+                underline: {
+                    '&:hover': {
+                        '&:before': {
+                            borderBottom: '1px solid rgba(255,255,255,.2) !important'
+                        }
+                    },
+                    '&:before': {
+                        borderBottom: '1px solid rgba(255,255,255,.2)'
+                    },
+                    '&:after': {
+                        borderBottom: '1px solid #fff'
+                    }
+                }
+            },
+            MuiInputBase: {
+                root: {
+                    color: '#fff',
+                    backgroundColor: 'inherit !important',
+                    '&:hover': {
+                        backgroundColor: 'inherit'
+                    },
+                    '& .Mui-disabled': {
+                        color: 'rgba(255, 255, 255, .38)'
                     }
                 }
             },
@@ -372,15 +418,24 @@ const MyLayout = ({logout, children, dashboard, title}) => {
     useEffect(() => {
         dispatch(setSidebarVisibility(windowWidth >= 800));
     }, [setSidebarVisibility]);
-
+    const role = roles.find(e => e.id === permission) && roles.find(e => e.id === permission).name;
     return (
         <ThemeProvider theme={theme}>
             <div className={classes.root}>
                 <div className={classes.appFrame}>
-                    <CustomAppBar theme={thisTheme} themes={themes} colors={colors} settheme={setThisTheme} title={title} open={open} logout={logout}/>
+                    <CustomAppBar theme={thisTheme} themes={themes} colors={colors} settheme={setThisTheme}
+                                  title={title} open={open} logout={logout}/>
                     <main className={classes.contentWithSidebar}>
                         <Sidebar className={classes.sidebar}>
                             <CustomMenu hasDashboard={!!dashboard}/>
+                            <div className={classes.roleWrapper}>
+                                <Typography className={classes.roleText}>
+                                    {open && 'Вы вошли как:'}
+                                </Typography>
+                                <Typography className={classes.role + ' ' + classes.roleText} variant="overline">
+                                    {open ? role : role[0]}
+                                </Typography>
+                            </div>
                         </Sidebar>
                         <div className={classes.content}>
                             {children}

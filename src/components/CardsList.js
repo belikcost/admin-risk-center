@@ -35,7 +35,7 @@ const CardsList = (props) => {
                 <Card key={id} className={classes.card}>
                     <CardHeader
                         title={<TextField record={data[id]} source="name"/>}
-                        avatar={<Avatar src={data[id]['photo_url'] || null_avatar}/>}
+                        avatar={props.avatar && <Avatar src={data[id]['photo_url'] || null_avatar}/>}
                         subheader={
                             <>
                                 <div className={classes.headerText}>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import './app.css';
 import {Component} from "react";
 import {Admin, Resource, fetchUtils} from 'react-admin';
 import authProvider from "./authProvider";

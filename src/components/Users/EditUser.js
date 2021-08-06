@@ -96,6 +96,7 @@ const EditUser = (props) => {
     const [clients, setClients] = useState({});
     const [disabledClients, setDisabledClients] = useState(false);
     const [users, setUsers] = useState({});
+    const [leaders, setLeaders] = useState({});
     const [saveDisabled, setSaveDisabled] = useState(true);
     const [projects, setProjects] = useState({});
     const [disabledProjects, setDisabledProjects] = useState(false);
@@ -125,14 +126,21 @@ const EditUser = (props) => {
             dataProvider.getList("users", {
                 pagination: {page: 1, perPage: 9999},
                 sort: {field: 'id', order: 'ASC'},
-                filter: res.role !== 'admin' ? {client: res.client} : {}
+                filter: res.role !== 'admin' ? {client: res.client, role: 'user'} : {role: 'user'}
             }).then(r => {
                 setUsers({...r, data: r.data.filter(u => u.id !== +this_user_id)});
             });
             dataProvider.getList("users", {
                 pagination: {page: 1, perPage: 9999},
                 sort: {field: 'id', order: 'ASC'},
-                filter: {leader: this_user_id}
+                filter: res.role !== 'admin' ? {client: res.client, role: 'leader'} : {role: 'leader'}
+            }).then(r => {
+                setLeaders({...r, data: r.data.filter(u => u.id !== +this_user_id)});
+            });
+            dataProvider.getList("users", {
+                pagination: {page: 1, perPage: 9999},
+                sort: {field: 'id', order: 'ASC'},
+                filter: {leader: this_user_id, role: 'user'}
             }).then(r => {
                 let data = [];
                 r.data.forEach(e => data.push(e.id));
@@ -147,7 +155,7 @@ const EditUser = (props) => {
                 res.role !== 'admin' && setDisabledClients(true);
                 setClients(r);
             });
-            res.id !== +this_user_id && setDisabledChangeRole(false);
+            res.id !== +this_user_id && (res.role === 'admin' || res.role === 'coordinator') && setDisabledChangeRole(false);
         });
     }, []);
     const save = useCallback(
@@ -177,7 +185,7 @@ const EditUser = (props) => {
         [update, notify, redirectTo, basePath]
     );
 
-    if (!clients.data || !users.data || !projects.data || !selectedUsers.data) {
+    if (!clients.data || !users.data || !projects.data || !selectedUsers.data || !leaders.data) {
         return <Loading/>
     } else {
         console.log(props.permissions);
@@ -193,7 +201,7 @@ const EditUser = (props) => {
                                        choices={clients.data} validate={required()}/>
                     <AutocompleteInput source="role" label="Роль" disabled={disabledChangeRole}
                                        choices={role_choices} validate={required()}/>
-                    <AutocompleteInput source="leader" label="Руководитель" disabled={disabledNotCoordinator} choices={users.data}/>
+                    <AutocompleteInput source="leader" label="Руководитель" disabled={disabledNotCoordinator} choices={leaders.data}/>
                     <SelectUsers
                         disabled={disabledNotCoordinator}
                         selected={selectedUsers}

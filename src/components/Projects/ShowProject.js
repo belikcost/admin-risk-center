@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
     Show,
+    SelectField,
     SimpleShowLayout,
     TextField,
     BooleanField,
@@ -32,6 +33,8 @@ import {CardActions, CardHeader, useMediaQuery} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 
 const ShowProject = (props) => {
+    const [clients, setClients] = useState({});
+    const [users, setUsers] = useState({});
     const isSmall = useMediaQuery('(max-width: 600px)');
     const isRemovePadding = useMediaQuery('(max-width: 850px)');
     const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
@@ -60,19 +63,28 @@ const ShowProject = (props) => {
             padding: isSmall ? '.5rem 1rem' : (isRemovePadding ? '24px 0' : '2.2rem'),
             backgroundColor: 'rgba(0,0,0,.2)',
             fontFamily: 'Nunito, sans-serif',
-        },
-        appsCont: {
-            display: 'flex'
         }
     });
 
     useEffect(() => {
+
+        dataProvider.getList("users", {
+            pagination: {page: 1, perPage: 9999},
+            sort: {field: 'id', order: 'ASC'},
+            filter: {}
+        }).then(r => setUsers(r));
+
+        dataProvider.getList("clients", {
+            pagination: {page: 1, perPage: 9999},
+            sort: {field: 'id', order: 'ASC'},
+            filter: {}
+        }).then(r => setClients(r));
+
         dataProvider.getList("requests", {
             pagination: {page: 1, perPage: 9999},
             sort: {field: 'id', order: 'ASC'},
             filter: {project_id: props.id},
         }).then(res => {
-            console.log(res);
             setApps(res.data);
             setIsLoading(false);
         });
@@ -123,13 +135,25 @@ const ShowProject = (props) => {
                             subheader={
                                 <>
                                     <div className={classes_card.headerText}>
-                                        <Typography variant="body2" className={classes_card.label}>ID:</Typography>
-                                        <Typography variant="body2">{a.id}</Typography>
+                                        <Typography variant="body2" className={classes_card.label}>Компания:</Typography>
+                                        <Typography variant="body2">{a.company_name}</Typography>
                                     </div>
                                     <div className={classes_card.headerText}>
                                         <Typography variant="body2" className={classes_card.label}>Тип:</Typography>
                                         <Typography variant="body2">{a.type === 'arbitrage' ? "Арбитражная" :
                                             "Мониторинговая"}</Typography>
+                                    </div>
+                                    <div className={classes_card.headerText}>
+                                        <Typography variant="body2" className={classes_card.label}>Заявку
+                                            создал:</Typography>
+                                        <Typography
+                                            variant="body2">{users.data.find(u => u.id === a.submitted_by).name}</Typography>
+                                    </div>
+                                    <div className={classes_card.headerText}>
+                                        <Typography variant="body2"
+                                                    className={classes_card.label}>Активность:</Typography>
+                                        <Typography variant="body2">{a.is_active ? <CheckIcon fontSize="small"/> :
+                                            <ClearIcon fontSize="small"/>}</Typography>
                                     </div>
                                 </>
                             }
@@ -147,9 +171,10 @@ const ShowProject = (props) => {
                 ) : (<Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="left">ID</TableCell>
                             <TableCell align="left">ИНН/номер дела</TableCell>
+                            <TableCell align="left">Компания</TableCell>
                             <TableCell align="left">Тип</TableCell>
+                            <TableCell align="left">Заявку создал</TableCell>
                             <TableCell align="left">Активность</TableCell>
                             <TableCell>&nbsp;</TableCell>
                         </TableRow>
@@ -157,10 +182,12 @@ const ShowProject = (props) => {
                     <TableBody>
                         {props.apps.map(a => (
                             <TableRow key={a.id}>
-                                <TableCell align="left">{a.id}</TableCell>
                                 <TableCell align="left">{a.value}</TableCell>
+                                <TableCell align="left">{a.company_name}</TableCell>
                                 <TableCell
                                     align="left">{a.type === 'arbitrage' ? "Арбитражная" : "Мониторинговая"}</TableCell>
+                                <TableCell
+                                    align="left">{users.data.find(u => u.id === a.submitted_by).name}</TableCell>
                                 <TableCell align="left">{a.is_active ? <CheckIcon fontSize="small"/> :
                                     <ClearIcon fontSize="small"/>}</TableCell>
                                 <TableCell align="left">{a.type === 'arbitrage' &&
@@ -205,14 +232,15 @@ const ShowProject = (props) => {
             </Card>
         );
     } else {
-        if (isLoading) {
+        if (isLoading || !users.data || !clients.data) {
             return (<Loading/>);
         } else {
             return (
                 <Show {...props}>
                     <SimpleShowLayout>
-                        <TextField source="id" label="ID"/>
                         <TextField source="name" label="Название"/>
+                        <SelectField choices={users.data} source="leader" label="Руководитель"/>
+                        <SelectField choices={clients.data} source="client" label="Клиент"/>
                         <BooleanField source="is_active" label="Активность"/>
                         {apps.length !== 0 && <TableField apps={apps} id={props.id} className={classes.appsCont}/>}
                     </SimpleShowLayout>

@@ -36,7 +36,7 @@ const ProjectsList = (props) => {
                 'Authorization': "Token " + localStorage.getItem('token')
             }
         }).then(res => res.json()).then(res => {
-            !permission && setFilter({id: res.projects});
+            permission && setFilter({client: res.client});
             setIsLoading(false);
         });
     }, [])
@@ -45,7 +45,7 @@ const ProjectsList = (props) => {
     } else {
         return (
             <List {...props} filter={filter} bulkActionButtons={<PostBulkActionButtons />}>
-                {isShowCard ? <CardsList edit={true} delete={!permission}/> :
+                {isShowCard ? <CardsList avatar={false} edit={true} delete={!permission}/> :
                     <Datagrid>
                         <TextField source="id" label="ID"/>
                         <TextField source="name" label="Название"/>

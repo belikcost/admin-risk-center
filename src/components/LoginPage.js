@@ -60,6 +60,7 @@ const LoginPage = () => {
     const login = useLogin();
     const classes = useStyles()
     const handleTelegramResponse = async response => {
+        let err = false;
         !response.photo_url && (response.photo_url = null_avatar);
         await fetch(process.env.REACT_APP_API + '/auth', {
             method: 'POST',
@@ -68,9 +69,14 @@ const LoginPage = () => {
             },
             body: JSON.stringify(response)
         }).then(res => res.json()).then(res => {
-            res.token ? localStorage.setItem('token', res.token) : setError(true);
+            if (res.token) {
+                localStorage.setItem('token', res.token)
+            } else {
+                err = true;
+                setError(true);
+            }
         });
-        !error && await fetch(process.env.REACT_APP_API + '/users/current', {
+        !err && await fetch(process.env.REACT_APP_API + '/users/current', {
             method: 'GET',
             headers: {
                 'Authorization': "Token " + localStorage.getItem('token')

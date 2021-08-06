@@ -4,6 +4,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import {useMediaQuery, ClickAwayListener, Typography, IconButton} from "@material-ui/core";
 import BrushIcon from '@material-ui/icons/Brush';
 import CheckIcon from '@material-ui/icons/Check';
+import roles from "../../roles";
+
 const CustomAppBar = props => {
     const isSmall = useMediaQuery('(max-width: 600px)');
     const useStyles = makeStyles((theme) => (
@@ -74,6 +76,7 @@ const CustomAppBar = props => {
         props.settheme(props.themes[i]);
         localStorage.setItem('theme', props.themes[i]);
     }
+    const permissions = localStorage.getItem('permissions');
     return (
         <div>
             <AppBar title={props.title} open={props.open} logout={props.logout} className={classes.appbar}>
@@ -93,7 +96,8 @@ const CustomAppBar = props => {
                                 <Typography variant="body2" className={classes.text}>Выбор темы</Typography>
                                 <div className={classes.themes}>
                                     {props.colors.map((c, i) => (
-                                        <div className={classes.theme} onClick={() => changeTheme(i)} key={i} style={{backgroundColor: c}}>
+                                        <div className={classes.theme} onClick={() => changeTheme(i)} key={i}
+                                             style={{backgroundColor: c}}>
                                             {props.colors[props.themes.indexOf(props.theme)] === c && <CheckIcon/>}
                                         </div>
                                     ))}
