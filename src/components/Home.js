@@ -2,12 +2,13 @@ import * as React from "react";
 import {Title, useGetList} from 'react-admin';
 import {makeStyles} from "@material-ui/core/styles";
 import {useMediaQuery, Typography} from "@material-ui/core";
+import { useEffect, useState } from "react";
 
 const Home = () => {
     const clients_list = useGetList('clients', undefined, undefined, undefined);
     const projects_list = useGetList('projects');
     const users_list = useGetList('users');
-
+    const [dashboardData, setDashboardData] = useState();
     const isLarge = useMediaQuery('(max-width: 1000px)');
     const useStyles = makeStyles(() => ({
         content: {
@@ -38,7 +39,9 @@ const Home = () => {
             display: 'flex',
             justifyContent: 'space-around',
             flexDirection: isLarge ? 'column' : 'row',
-            alignItems: 'center'
+            alignItems: 'center',
+            marginBottom: '2rem',
+            maxWidth: 'fit-content'
         },
         widget: {
             backgroundColor: 'rgba(0,0,0,.2)',
@@ -56,11 +59,37 @@ const Home = () => {
             color: 'rgba(255,255,255,.7)',
             display: 'block',
             lineHeight: '12px'
+        },
+        company: {
+            flexDirection: 'column',
+            alignItems: 'baseline'
+        },
+        companyName: {
+          textDecoration: 'underline'
+        },
+        events: {
+            display: 'flex',
+            flexWrap: 'wrap'
+        },
+        event: {
+            margin: '1rem'
+        },
+        eventType: {
+            fontSize: 17
+        },
+        eventData: {
+            fontSize: 14
         }
     }));
 
     const classes = useStyles({margin: '0'});
-    if (clients_list.loading || projects_list.loading) {
+
+    useEffect(() => {
+        fetch('https://5e4a4fc6-529f-44b1-bdea-f9aba3273253.mock.pstmn.io/dashboard')
+            .then(r => r.json()).then(setDashboardData)
+    }, []);
+
+    if (clients_list.loading || projects_list.loading || !dashboardData) {
         return null;
     } else {
         let clients = Object.values(clients_list.data).length, projects = Object.values(projects_list.data).length,
@@ -196,6 +225,23 @@ const Home = () => {
                             </svg>
                         </div>
                     </div>
+                    {dashboardData.map((company, i) => (
+                        <div key={i} className={classes.widgetWrapper}>
+                            <div className={`${classes.widget} ${classes.company}`}>
+                                <Typography variant="h6" className={classes.companyName}>{company.company_name}</Typography>
+                                <div className={classes.events}>
+                                    {company.events.map((event, i) => (
+                                        <div className={classes.event} key={i}>
+                                            <Typography variant="h6" className={classes.eventType}>{event.type}</Typography>
+                                            {event.data.map((description, i) => (
+                                                <p className={classes.eventData} key={i}>{description}</p>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         );
